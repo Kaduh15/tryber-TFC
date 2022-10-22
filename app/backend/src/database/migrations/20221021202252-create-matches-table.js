@@ -16,7 +16,9 @@ module.exports = {
         references: {
           model: 'teams',
           key: 'id',
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       home_team_goals: {
         type: Sequelize.INTEGER,
@@ -28,7 +30,9 @@ module.exports = {
         references: {
           model: 'teams',
           key: 'id',
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       away_team_goals: {
         type: Sequelize.INTEGER,
@@ -46,7 +50,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-
     await queryInterface.dropTable('matches');
   }
 };
