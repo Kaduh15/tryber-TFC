@@ -14,9 +14,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: {
-            tableName: 'teams'
-          },
+          model: 'teams',
           key: 'id',
         }
       },
@@ -28,9 +26,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: {
-            tableName: 'teams'
-          },
+          model: 'teams',
           key: 'id',
         }
       },
