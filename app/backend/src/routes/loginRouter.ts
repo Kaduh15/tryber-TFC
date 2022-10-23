@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import JWT from '../utils/JWT';
 import bodyLogin from '../schemas/bodyLogin';
 import bodyMiddleware from '../middlewares/bodyMiddleware';
 import LoginController from '../controllers/LoginController';
@@ -9,9 +10,15 @@ const loginController = new LoginController();
 
 const router = Router();
 
-router.use(bodyMiddleware(bodyLogin));
+router
+  .post('/', bodyMiddleware(bodyLogin), (req, res) => loginController.login(req, res));
 
 router
-  .post('/', (req, res) => loginController.login(req, res));
+  .get('/validate', (req, res) => {
+    const token = req.headers.authorization || '';
+    const payload = JWT.tokenValidation(token);
+
+    res.status(200).json({ role: payload.role });
+  });
 
 export default router;
