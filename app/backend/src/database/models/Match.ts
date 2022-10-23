@@ -3,7 +3,7 @@ import db from '.';
 import Team from './Team';
 // import OtherModel from './OtherModel';
 
-class Matche extends Model {
+class Match extends Model {
   declare id: number;
   declare homeTeam: number;
   declare homeTeamGoals: number;
@@ -12,7 +12,7 @@ class Matche extends Model {
   declare inProgress: number;
 }
 
-Matche.init({
+Match.init({
   id: {
     allowNull: false,
     autoIncrement: true,
@@ -42,7 +42,7 @@ Matche.init({
 }, {
   underscored: true,
   sequelize: db,
-  modelName: 'matches',
+  // modelName: 'matches',
   timestamps: false,
 });
 
@@ -56,10 +56,10 @@ Matche.init({
 
 // Example.hasMany(OtherModel, { foreignKey: 'campoC', as: 'campoEstrangeiroC' });
 // Example.hasMany(OtherModel, { foreignKey: 'campoD', as: 'campoEstrangeiroD' });
-Matche.belongsTo(Team, { foreignKey: 'homeTeam', as: 'teamHome' });
-Matche.belongsTo(Team, { foreignKey: 'awayTeam', as: 'teamAway' });
+Match.belongsTo(Team, { foreignKey: 'homeTeam', as: 'teamHome' });
+Match.belongsTo(Team, { foreignKey: 'awayTeam', as: 'teamAway' });
 
-Team.hasMany(Matche, { foreignKey: 'homeTeam', as: 'teamHome' });
-Team.hasMany(Matche, { foreignKey: 'awayTeam', as: 'teamAway' });
+Team.hasMany(Match, { foreignKey: 'homeTeam', as: 'teamHome' });
+Team.hasMany(Match, { foreignKey: 'awayTeam', as: 'teamAway' });
 
-export default Matche;
+export default Match;
