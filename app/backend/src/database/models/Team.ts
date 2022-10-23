@@ -4,7 +4,7 @@ import db from '.';
 
 class Teams extends Model {
   declare id: number;
-  declare teamsName: string;
+  declare teamName: string;
 }
 
 Teams.init({
@@ -14,7 +14,7 @@ Teams.init({
     allowNull: false,
     autoIncrement: true,
   },
-  teamsName: {
+  teamName: {
     type: DataTypes.STRING,
   },
 }, {
