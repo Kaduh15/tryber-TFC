@@ -2,11 +2,13 @@ import * as sinon from 'sinon';
 import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
+const { expect } = chai;
+
+import TeamModel from '../database/models/Team';
+import { Model } from 'sequelize';
 
 import { app } from '../app'
-import TeamModel from '../database/models/Team';
 
-const { expect } = chai;
 
 chai.use(chaiHttp);
 
@@ -28,25 +30,27 @@ const mockTeams = [
 describe('---------------------- Rota Teams ----------------------', () => {
 
   
-  describe('GET /Teams', () => {
-    // describe('Casos de erros', () => {
-    //   it('Busca apenas um time pelo o id!', async () => {
+  describe('1 - GET /Teams', () => {
+
+    describe('Casos de erros', () => {
+
+      it('Busca apenas um time pelo o id!', async () => {
       
-    //     const idIncorrect = 998
+        const idIncorrect = 998
         
-    //     sinon
-    //     .stub(TeamModel, 'findOne')
-    //     .resolves(null)
+        sinon.restore()
+
+        sinon
+          .stub(Model, 'findOne')
+          .resolves(null)
           
-    //       const httpResponse = await chai.request(app)
-    //       .get(`/teams/${idIncorrect + 1}`)
+        const httpResponse = await chai.request(app)
+        .get(`/teams/${idIncorrect + 1}`)
           
-    //       expect(httpResponse.status).to.equal(200);
-    //       expect(httpResponse.body).to.deep.equal(mockTeams[idIncorrect]);
-          
-    //       (TeamModel.findOne as sinon.SinonStub).restore()
-    //   })
-    // })
+        expect(httpResponse.status).to.equal(404);
+        expect(httpResponse.body).to.deep.equal({message: 'Team not found'});
+      })
+    })
       
     describe('Casos de sucessos', () => {
       
@@ -69,8 +73,10 @@ describe('---------------------- Rota Teams ----------------------', () => {
         
         const idCorrect = 1
         
+        sinon.restore()
+
         sinon
-        .stub(TeamModel, 'findOne')
+        .stub(Model, 'findOne')
         .resolves(
           mockTeams[idCorrect] as TeamModel
           )

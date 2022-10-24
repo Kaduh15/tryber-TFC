@@ -4,6 +4,8 @@ import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 
+import { Model } from 'sequelize';
+
 import IMatche from '../interfaces/IMatch'
 
 import { app } from '../app'
@@ -501,16 +503,16 @@ const mockListMatches = [
 ]
 
 const mockInsertMetch = {
-  "homeTeam": 16, // O valor deve ser o id do time
-  "awayTeam": 8, // O valor deve ser o id do time
-  "homeTeamGoals": 2,
-  "awayTeamGoals": 2,
+  homeTeam: 16, // O valor deve ser o id do time
+  awayTeam: 8, // O valor deve ser o id do time
+  homeTeamGoals: 2,
+  awayTeamGoals: 2,
 }
 const mockInsertMetchError = {
-  "homeTeam": 999999, // O valor deve ser o id do time
-  "awayTeam": 999999, // O valor deve ser o id do time
-  "homeTeamGoals": 2,
-  "awayTeamGoals": 2,
+  homeTeam: 999999, // O valor deve ser o id do time
+  awayTeam: 999999, // O valor deve ser o id do time
+  homeTeamGoals: 2,
+  awayTeamGoals: 2,
 }
 
 const mockInsertMetchResult = {
@@ -520,12 +522,12 @@ const mockInsertMetchResult = {
 }
 
 const mockScore = {
-  "homeTeamGoals": 3,
-  "awayTeamGoals": 1
+  homeTeamGoals: 3,
+  awayTeamGoals: 1
 }
 
 
-const mockListMatchesInProgress = (boolean: boolean) => mockListMatches.filter(({ inProgress }) => {
+const mockListMatchesFunc = (boolean: boolean) => mockListMatches.filter(({ inProgress }) => {
   return boolean ? !inProgress : !!inProgress
 })
 
@@ -534,16 +536,23 @@ const tokenInvalid = 'tokenInvalid'
 
 describe('-------------------- Rota Matches --------------------', () =>{
 
+  after(() => {
+    sinon.restore()
+  })
+
   describe('1 - GET /matches', () => {
     // describe('Casos de erros', () => {
     // })
-
     describe('Casos de sucessos', () => {
-    
+      
+      after(() => {
+        sinon.restore()
+      })
+
       it('Busca todas as matches!', async () => {
         
         sinon
-          .stub(MatchModel, 'findAll')
+          .stub(Model, 'findAll')
           .resolves(
             mockListMatches as unknown as MatchModel[]
             )
@@ -553,9 +562,7 @@ describe('-------------------- Rota Matches --------------------', () =>{
         
         expect(httpResponse.status).to.equal(200);
         expect(httpResponse.body).to.deep.equal(mockListMatches);
-        
-        (MatchModel.findAll as sinon.SinonStub).restore();
-      } )
+      })
     })
   })
 
@@ -569,43 +576,48 @@ describe('-------------------- Rota Matches --------------------', () =>{
         const inProgress = true;
 
         sinon
-        .stub(MatchModel, 'findAll')
+          .stub(Model, 'findAll')
           .resolves(
-            mockListMatchesInProgress(inProgress) as unknown as MatchModel[]
+            mockListMatchesFunc(inProgress) as unknown as MatchModel[]
             )
             
             const httpResponse = await chai.request(app)
             .get(`/matches?inProgress=${inProgress}`)
         
         expect(httpResponse.status).to.equal(200);
-        expect(httpResponse.body).to.deep.equal(mockListMatchesInProgress(inProgress));
-        
-        (MatchModel.findAll as sinon.SinonStub).restore();
-      } )
+        expect(httpResponse.body).to.deep.equal(mockListMatchesFunc(inProgress));
 
-      it('Busca todas as matches que não estão em progresso!', async () => {
+        sinon.restore()
+      })
+
+      it('Busca todas as matches finalizadas!', async () => {
         const inProgress = false;
-        
+
         sinon
-        .stub(MatchModel, 'findAll')
-        .resolves(
-          mockListMatchesInProgress(inProgress) as unknown as MatchModel[]
-          )
-          
-        const httpResponse = await chai.request(app)
-        .get(`/matches?inProgress=${inProgress}`)
+        .stub(Model, 'findAll')
+          .resolves(
+            mockListMatchesFunc(inProgress) as unknown as MatchModel[]
+            )
+            
+            const httpResponse = await chai.request(app)
+            .get(`/matches?inProgress=${inProgress}`)
         
         expect(httpResponse.status).to.equal(200);
-        expect(httpResponse.body).to.deep.equal(mockListMatchesInProgress(inProgress));
-        
-        (MatchModel.findAll as sinon.SinonStub).restore();
-      } )
+        expect(httpResponse.body).to.deep.equal(mockListMatchesFunc(inProgress));
+
+        sinon.restore()
+      })
     })
   })
 
   describe('3 - POST /matches', () => {
 
     describe('Casos de error', () => {
+
+      after(() => {
+        sinon.restore()
+      })
+
       it('Caso não passe nenhum token no headers', async () => {
 
         const httpResponse = await chai.request(app)
@@ -720,9 +732,13 @@ describe('-------------------- Rota Matches --------------------', () =>{
     
     describe('Casos de sucesso', () => {
 
+      after(() => {
+        sinon.restore()
+      })
+
       it('Cadastro de uma partida com sucesso!', async () => {
         sinon
-          .stub(MatchModel, 'create')
+          .stub(Model, 'create')
           .resolves(mockInsertMetchResult as unknown as MatchModel)
           
           const httpResponse = await chai.request(app)
@@ -731,8 +747,6 @@ describe('-------------------- Rota Matches --------------------', () =>{
           .set({ Authorization: tokenValid });
 
         expect(httpResponse.status).to.equal(201);
-
-        (MatchModel.create as sinon.SinonStub).restore();
       })
       
     })
@@ -741,6 +755,10 @@ describe('-------------------- Rota Matches --------------------', () =>{
   describe('4 - PACTH /matches/:id/finish', () => {
     describe('Casos de Error', () => {
       
+      after(() => {
+        sinon.restore()
+      })
+
       it('Caso seja passado um id inexistente!', async () => {
         const id = 99999;
         
@@ -768,11 +786,15 @@ describe('-------------------- Rota Matches --------------------', () =>{
 
     describe('Casos de sucesso', () => {
 
+      after(() => {
+        sinon.restore()
+      })
+
       it('Partida encerrada com sucesso!', async () => {
         const id = 47;
         
         sinon
-        .stub(MatchModel, 'findOne')
+        .stub(Model, 'findOne')
         .resolves(mockInsertMetchResult as unknown as MatchModel)
 
         const httpResponse = await chai.request(app)
@@ -780,20 +802,23 @@ describe('-------------------- Rota Matches --------------------', () =>{
         
         expect(httpResponse.status).to.equal(200);
         expect(httpResponse.body).to.deep.equal({ message: 'Finished' });
-
-        (MatchModel.findOne as sinon.SinonStub).restore();
       })
     })
 
   })
+
   describe('5 - PACTH /matches/:id', () => {
     describe('Casos de Error', () => {
+
+      after(() => {
+        sinon.restore()
+      })
 
       it('Caso seja passado um id inexistente!', async () => {
         const id = 99999;
 
         sinon
-          .stub(MatchModel, 'findOne')
+          .stub(Model, 'findOne')
           .resolves(null)
         
         const httpResponse = await chai.request(app)
@@ -803,18 +828,20 @@ describe('-------------------- Rota Matches --------------------', () =>{
         expect(httpResponse.body).to.deep.equal({
           message: 'Macth not found',
         });
-
-        (MatchModel.findOne as sinon.SinonStub).restore();
       })
     })
 
     describe('Casos de sucesso', () => {
 
+      after(() => {
+        sinon.restore()
+      })
+
       it('Placar atualizado com sucesso!', async () => {
         const id = 41;
         
         sinon
-          .stub(MatchModel, 'findOne')
+          .stub(Model, 'findOne')
           .resolves(mockInsertMetchResult as unknown as MatchModel)
 
         const httpResponse = await chai.request(app)
@@ -822,8 +849,6 @@ describe('-------------------- Rota Matches --------------------', () =>{
           .send(mockScore);
         
         expect(httpResponse.status).to.equal(200);
-
-        (MatchModel.findOne as sinon.SinonStub).restore();
       })
     })
 

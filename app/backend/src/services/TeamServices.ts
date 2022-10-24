@@ -1,3 +1,4 @@
+import HttpError from '../utils/HttpError';
 import TeamModel from '../database/models/Team';
 import ITeam from '../interfaces/ITeam';
 
@@ -12,6 +13,7 @@ export default class TeamService {
 
   async findById(id: number): Promise<ITeam | null> {
     const team = await this.model.findOne({ where: { id } });
+    if (!team) throw new HttpError('Team not found', 404);
 
     return team;
   }
