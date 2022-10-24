@@ -1,10 +1,20 @@
-import IMatch from '../interfaces/IMatch';
+import IMatch, { IMatchCreate } from '../interfaces/IMatch';
 import TeamModel from '../database/models/Team';
 import MatchModel from '../database/models/Match';
-// import IMatch from '../interfaces/IMatch';
+import HttpError from '../utils/HttpError';
 
 export default class MatchService {
   private model = MatchModel;
+
+  static async teamValidation(id: number): Promise<boolean | void> {
+    const hasTeam = await TeamModel.findOne({
+      where: { id },
+    });
+
+    if (!hasTeam) throw new HttpError('Team not found', 404);
+
+    return true;
+  }
 
   async findAll(inProgress: boolean | undefined): Promise<IMatch[]> {
     const matches = await this.model.findAll({
@@ -12,10 +22,7 @@ export default class MatchService {
         ...(typeof inProgress === 'boolean' ? { inProgress } : undefined),
       },
       include: [
-        { model: TeamModel,
-          as: 'teamHome',
-          attributes: ['teamName'],
-        },
+        { model: TeamModel, as: 'teamHome', attributes: ['teamName'] },
         { model: TeamModel, as: 'teamAway', attributes: ['teamName'] },
       ],
     });
@@ -23,9 +30,12 @@ export default class MatchService {
     return matches;
   }
 
-  // async findById(id: number): Promise<IMatch | null> {
-  //   const Match = await this.model.findOne({ where: { id } });
+  async create(match: IMatchCreate): Promise<IMatch | null> {
+    await MatchService.teamValidation(match.homeTeam);
+    await MatchService.teamValidation(match.awayTeam);
 
-  //   return Match;
-  // }
+    const Match = await this.model.create({ ...match, inProgress: true });
+
+    return Match;
+  }
 }

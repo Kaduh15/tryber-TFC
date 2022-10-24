@@ -6,13 +6,16 @@ import chaiHttp = require('chai-http');
 import IMatche from '../interfaces/IMatch'
 
 import { app } from '../app'
-import MatcheModel from '../database/models/Match';
+import MatchModel from '../database/models/Match';
+import TeamModel from '../database/models/Match';
+import MatchService from '../services/MatchServices';
+import Team from '../database/models/Team';
 
 const { expect } = chai;
 
 chai.use(chaiHttp);
 
-const mockMetches = [
+const mockListMatches = [
   {
     id: 1,
     homeTeam: 16,
@@ -495,7 +498,26 @@ const mockMetches = [
   }
 ]
 
-const mockMetchesInProgress = (boolean: boolean) => mockMetches.filter(({ inProgress }) => {
+const mockInsertMetch = {
+  "homeTeam": 16, // O valor deve ser o id do time
+  "awayTeam": 8, // O valor deve ser o id do time
+  "homeTeamGoals": 2,
+  "awayTeamGoals": 2,
+}
+const mockInsertMetchError = {
+  "homeTeam": 999999, // O valor deve ser o id do time
+  "awayTeam": 999999, // O valor deve ser o id do time
+  "homeTeamGoals": 2,
+  "awayTeamGoals": 2,
+}
+
+const mockInsertMetchResult = {
+  id: 1,
+  ...mockInsertMetch,
+  inProgress: true,
+}
+
+const mockListMatchesInProgress = (boolean: boolean) => mockListMatches.filter(({ inProgress }) => {
   return boolean ? !inProgress : !!inProgress
 })
 
@@ -508,18 +530,18 @@ describe('1 - GET /matches', () => {
     it('Busca todas as matches!', async () => {
 
       sinon
-        .stub(MatcheModel, 'findAll')
+        .stub(MatchModel, 'findAll')
         .resolves(
-          mockMetches as unknown as MatcheModel[]
+          mockListMatches as unknown as MatchModel[]
         )
 
       const httpResponse = await chai.request(app)
       .get('/matches')
       
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body).to.deep.equal(mockMetches);
+      expect(httpResponse.body).to.deep.equal(mockListMatches);
 
-      (MatcheModel.findAll as sinon.SinonStub).restore();
+      (MatchModel.findAll as sinon.SinonStub).restore();
     } )
   })
 })
@@ -534,37 +556,126 @@ describe('2 - GET /matches?inProgress', () => {
       const inProgress = true;
 
       sinon
-        .stub(MatcheModel, 'findAll')
+        .stub(MatchModel, 'findAll')
         .resolves(
-          mockMetchesInProgress(inProgress) as unknown as MatcheModel[]
+          mockListMatchesInProgress(inProgress) as unknown as MatchModel[]
         )
 
         const httpResponse = await chai.request(app)
           .get(`/matches?inProgress=${inProgress}`)
       
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body).to.deep.equal(mockMetchesInProgress(inProgress));
+      expect(httpResponse.body).to.deep.equal(mockListMatchesInProgress(inProgress));
       
-      (MatcheModel.findAll as sinon.SinonStub).restore();
+      (MatchModel.findAll as sinon.SinonStub).restore();
     } )
 
     it('Busca todas as matches que não estão em progresso!', async () => {
       const inProgress = false;
 
       sinon
-        .stub(MatcheModel, 'findAll')
+        .stub(MatchModel, 'findAll')
         .resolves(
-          mockMetchesInProgress(inProgress) as unknown as MatcheModel[]
+          mockListMatchesInProgress(inProgress) as unknown as MatchModel[]
         )
 
       const httpResponse = await chai.request(app)
       .get(`/matches?inProgress=${inProgress}`)
       
       expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body).to.deep.equal(mockMetchesInProgress(inProgress));
+      expect(httpResponse.body).to.deep.equal(mockListMatchesInProgress(inProgress));
 
-      (MatcheModel.findAll as sinon.SinonStub).restore();
+      (MatchModel.findAll as sinon.SinonStub).restore();
     } )
+  })
+})
+
+describe.only('3 - POST /matches', () => {
+  describe('Casos de error', () => {
+
+    it('Caso não venha o homeTeam!', async () => {
+      const { homeTeam, ...match } = mockInsertMetch
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(match);
+
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'All fields must be filled'
+      });
+
+    })
+
+    it('Caso não venha o awayTeam!', async () => {
+      const { awayTeam, ...match } = mockInsertMetch
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(match);
+
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'All fields must be filled'
+      });
+
+    })
+
+    it('Caso não venha o homeTeamGoals!', async () => {
+      const { homeTeamGoals, ...match } = mockInsertMetch
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(match);
+
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'All fields must be filled'
+      });
+
+    })
+
+    it('Caso não venha o awayTeamGoals!', async () => {
+      const { awayTeamGoals, ...match } = mockInsertMetch
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(match);
+
+      expect(httpResponse.status).to.equal(400);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'All fields must be filled'
+      });
+
+    })
+
+    it('Caso o algum time não exista!', async () => {
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(mockInsertMetchError);
+      
+      expect(httpResponse.status).to.equal(404);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'Team not found'
+      });
+    })
+  })
+
+  describe('Casos de sucesso', () => {
+
+    it('Cadastro de uma partida com sucesso!', async () => {
+      sinon
+        .stub(MatchModel, 'create')
+        .resolves(mockInsertMetchResult as unknown as MatchModel)
+
+      const httpResponse = await chai.request(app)
+        .post('/matches')
+        .send(mockInsertMetch);
+
+      expect(httpResponse.status).to.equal(201);
+    })
+
   })
 })
 

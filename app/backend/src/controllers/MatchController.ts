@@ -19,11 +19,9 @@ export default class MacthController {
     res.status(200).json(Macthes);
   }
 
-  // async findById(req: Request, res: Response): Promise<void> {
-  //   const { id } = req.params;
+  async create(req: Request, res: Response): Promise<void> {
+    const Macthers = await this.service.create(req.body);
 
-  //   const Macthers = await this.service.findById(Number(id));
-
-  //   res.status(200).json(Macthers);
-  // }
+    res.status(201).json(Macthers);
+  }
 }
