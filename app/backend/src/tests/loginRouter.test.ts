@@ -6,6 +6,7 @@ import * as chai from 'chai';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 import * as bcrypt from 'bcryptjs';
+import { Model } from 'sequelize';
 
 import { app } from '../app'
 import UserModel from '../database/models/User';
@@ -31,11 +32,8 @@ const mockToken = {
 }
 
 const payload = JWT.tokenValidation(token as string);
-describe('---------------------- Rota Login ----------------------', () => {
 
-  after(() => {
-    sinon.restore()
-  })
+describe('---------------------- Rota Login ----------------------', () => {
 
   describe('1 - POST /login', () => {
 
@@ -47,10 +45,10 @@ describe('---------------------- Rota Login ----------------------', () => {
 
       it('caso o username não tenha passado', async () => {
         const httpResponse = await chai.request(app)
-        .post('/login')
-        .send({
-          password: 'any_password'
-        });
+          .post('/login')
+          .send({
+            password: 'any_password'
+          });
         
         expect(httpResponse.status).to.equal(400);
         expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
@@ -117,15 +115,15 @@ describe('---------------------- Rota Login ----------------------', () => {
       it('Login feito com sucesso', async () => {
         
         sinon
-          .stub(UserModel, "findOne")
+          .stub(Model, "findOne")
           .resolves({
             email: emailCorrect,
             password: passwordHash,
           } as UserModel);
           
         sinon
-        .stub(JWT, "tokenGenerator")
-        .resolves(mockToken.token);
+          .stub(JWT, "tokenGenerator")
+          .resolves(mockToken.token);
 
         const httpResponse = await chai.request(app)
         .post('/login')
@@ -217,12 +215,13 @@ describe('---------------------- Rota Login ----------------------', () => {
 
       it('Caso seja enviado o Token corretamente!', async () => {
         const httpResponse = await chai.request(app)
-        .get('/login/validate')
-        .set({'Authorization': token });
+          .get('/login/validate')
+          .set({'Authorization': token });
 
         expect(httpResponse.status).to.equal(200);
         expect(httpResponse.body).to.deep.equal({ role: payload.role });
       })
     })
   })
+
 })

@@ -1,4 +1,4 @@
-joi -S
-@types/joi -D
-joi-to-typescript -D
-express-async-errors -S
+joi
+@types/joi
+joi-to-typescript
+express-async-errors

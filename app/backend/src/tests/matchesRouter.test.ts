@@ -564,6 +564,7 @@ describe('-------------------- Rota Matches --------------------', () =>{
         expect(httpResponse.body).to.deep.equal(mockListMatches);
       })
     })
+
   })
 
   describe('2 - GET /matches?inProgress', () => {
@@ -737,6 +738,7 @@ describe('-------------------- Rota Matches --------------------', () =>{
       })
 
       it('Cadastro de uma partida com sucesso!', async () => {
+      
         sinon
           .stub(Model, 'create')
           .resolves(mockInsertMetchResult as unknown as MatchModel)
@@ -761,6 +763,10 @@ describe('-------------------- Rota Matches --------------------', () =>{
 
       it('Caso seja passado um id inexistente!', async () => {
         const id = 99999;
+
+        sinon
+          .stub(Model, 'findOne')
+          .resolves(null)
         
         const httpResponse = await chai.request(app)
         .patch(`/matches/${id}/finish`)
@@ -769,6 +775,8 @@ describe('-------------------- Rota Matches --------------------', () =>{
         expect(httpResponse.body).to.deep.equal({
           message: 'Macth not found',
         });
+
+        sinon.restore()
       })
       
       it('Caso a partida já esteja encerrada!', async () => {
