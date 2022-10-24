@@ -19,4 +19,10 @@ router
     (req, res) => matchController.create(req, res),
   );
 
+router
+  .patch(
+    '/:id/finish',
+    (req, res) => matchController.finishMacth(req, res),
+  );
+
 export default router;

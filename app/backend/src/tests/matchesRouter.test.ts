@@ -590,7 +590,7 @@ describe('2 - GET /matches?inProgress', () => {
   })
 })
 
-describe.only('3 - POST /matches', () => {
+describe('3 - POST /matches', () => {
   describe('Casos de error', () => {
 
     it('Caso não venha o homeTeam!', async () => {
@@ -679,4 +679,49 @@ describe.only('3 - POST /matches', () => {
   })
 })
 
+describe.only('4 - PACTH /matches/:id/finish', () => {
+  describe('Casos de Error', () => {
+    
+    it('Caso seja passado um id inexistente!', async () => {
+      const id = 99999;
 
+      const httpResponse = await chai.request(app)
+        .patch(`/matches/${id}/finish`)
+
+      expect(httpResponse.status).to.equal(404);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'Macth not found',
+      });
+    })
+
+    it('Caso a partida já esteja encerrada!', async () => {
+      const id = 1;
+
+      const httpResponse = await chai.request(app)
+        .patch(`/matches/${id}/finish`)
+
+      expect(httpResponse.status).to.equal(409);
+      expect(httpResponse.body).to.deep.equal({
+        message: 'Match already over',
+      });
+    })
+  })
+
+  describe('Casos de sucesso', () => {
+
+    it('Partida encerrada com sucesso!', async () => {
+      const id = 47;
+
+      sinon
+        .stub(MatchModel, 'findOne')
+        .resolves(mockInsertMetchResult as unknown as MatchModel)
+
+      const httpResponse = await chai.request(app)
+        .patch(`/matches/${id}/finish`)
+
+      expect(httpResponse.status).to.equal(201);
+      expect(httpResponse.body).to.deep.equal({ message: 'Finished' });
+    })
+  })
+
+})

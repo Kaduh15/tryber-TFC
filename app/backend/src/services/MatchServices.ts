@@ -38,4 +38,16 @@ export default class MatchService {
 
     return Match;
   }
+
+  async finishMacth(id: number): Promise<void> {
+    const hasMatch = await this.model.findOne({ where: { id } });
+    if (!hasMatch) throw new HttpError('Macth not found', 404);
+    if (!hasMatch.inProgress) throw new HttpError('Match already over', 409);
+
+    await this.model.update({
+      inProgress: false,
+    }, {
+      where: { id },
+    });
+  }
 }

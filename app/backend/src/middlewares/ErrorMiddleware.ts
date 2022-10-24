@@ -9,6 +9,7 @@ function errorMiddleware(
 ) {
   const status = error.status || 500;
   const message = error.message || 'Something went wrong';
+  console.log('🚀 ~ file: ErrorMiddleware.ts ~ line 12 ~ message', message);
 
   response
     .status(status)

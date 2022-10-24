@@ -24,4 +24,12 @@ export default class MacthController {
 
     res.status(201).json(Macthers);
   }
+
+  async finishMacth(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    await this.service.finishMacth(Number(id));
+
+    res.status(201).json({ message: 'Finished' });
+  }
 }
