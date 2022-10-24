@@ -30,6 +30,14 @@ export default class MacthController {
 
     await this.service.finishMacth(Number(id));
 
-    res.status(201).json({ message: 'Finished' });
+    res.status(200).json({ message: 'Finished' });
+  }
+
+  async updateMatchScore(req: Request, res: Response): Promise<void> {
+    const { id } = req.params;
+
+    await this.service.updateMatchScore(Number(id), req.body);
+
+    res.sendStatus(200);
   }
 }

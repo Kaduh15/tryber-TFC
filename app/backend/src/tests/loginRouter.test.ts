@@ -31,60 +31,61 @@ const mockToken = {
 }
 
 const payload = JWT.tokenValidation(token as string);
+describe('---------------------- Rota Login ----------------------', () => {
 
-describe('POST /login', () => {
-  describe('Casos de erros', () => {
+  describe('POST /login', () => {
+    describe('Casos de erros', () => {
 
-    it('caso o username não tenha passado', async () => {
-      const httpResponse = await chai.request(app)
+      it('caso o username não tenha passado', async () => {
+        const httpResponse = await chai.request(app)
         .post('/login')
         .send({
           password: 'any_password'
         });
-      
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
-    })
+        
+        expect(httpResponse.status).to.equal(400);
+        expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
+      })
 
-    it('caso o password não tenha passado', async () => {
-      const httpResponse = await chai.request(app)
+      it('caso o password não tenha passado', async () => {
+        const httpResponse = await chai.request(app)
         .post('/login')
         .send({
           email: 'any_email@mail.com'
         });
+        
+        expect(httpResponse.status).to.equal(400);
+        expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
+      })
       
-      expect(httpResponse.status).to.equal(400);
-      expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
-    })
-
-    it('caso o email esteja incorreto', async () => {
+      it('caso o email esteja incorreto', async () => {
       sinon
-        .stub(UserModel, "findOne")
+      .stub(UserModel, "findOne")
         .resolves(null);
-
-      const httpResponse = await chai.request(app)
+        
+        const httpResponse = await chai.request(app)
         .post('/login')
         .send({
           email: emailIncorrect,
           password: 'any_password'
         });
       
-      expect(httpResponse.status).to.equal(401);
+        expect(httpResponse.status).to.equal(401);
       expect(httpResponse.body).to.deep.equal( { message: "Incorrect email or password" });
 
       (UserModel.findOne as sinon.SinonStub).restore();
     })
 
     it('caso o password esteja incorreto', async () => {
-
+      
       sinon
         .stub(UserModel, "findOne")
         .resolves({
           email: emailCorrect,
           password: passwordHash,
         } as UserModel);
-
-      const httpResponse = await chai.request(app)
+        
+        const httpResponse = await chai.request(app)
         .post('/login')
         .send({
           email: emailIncorrect,
@@ -99,26 +100,26 @@ describe('POST /login', () => {
   })
 
   describe('Casos de sucessos', () => {
-
+    
     it('Login feito com sucesso', async () => {
       
       sinon
-        .stub(UserModel, "findOne")
-        .resolves({
-          email: emailCorrect,
+      .stub(UserModel, "findOne")
+      .resolves({
+        email: emailCorrect,
           password: passwordHash,
         } as UserModel);
-
+        
       sinon
-        .stub(JWT, "tokenGenerator")
-        .resolves(mockToken.token);
+      .stub(JWT, "tokenGenerator")
+      .resolves(mockToken.token);
 
       const httpResponse = await chai.request(app)
-        .post('/login')
-        .send({
-          email: emailCorrect,
-          password: passwordCorrect
-        });
+      .post('/login')
+      .send({
+        email: emailCorrect,
+        password: passwordCorrect
+      });
       
       expect(httpResponse.status).to.equal(200);
       expect(httpResponse.body).to.deep.equal(mockToken);
@@ -131,81 +132,82 @@ describe('POST /login', () => {
 })
 
 describe('GET /login/validate', () => {
-  // describe('Casos de erros', () => {
+  describe('Casos de erros', () => {
 
-  //   it('caso o username não tenha passado', async () => {
-  //     const httpResponse = await chai.request(app)
-  //       .post('/login')
-  //       .send({
-  //         password: 'any_password'
-  //       });
+      it('caso o username não tenha passado', async () => {
+      const httpResponse = await chai.request(app)
+        .post('/login')
+        .send({
+            password: 'any_password'
+          });
+    
+        expect(httpResponse.status).to.equal(400);
+        expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
+    })
+
+    it('caso o password não tenha passado', async () => {
+        const httpResponse = await chai.request(app)
+          .post('/login')
+          .send({
+              email: 'any_email@mail.com'
+            });
       
-  //     expect(httpResponse.status).to.equal(400);
-  //     expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
-  //   })
-
-  //   it('caso o password não tenha passado', async () => {
-  //     const httpResponse = await chai.request(app)
-  //       .post('/login')
-  //       .send({
-  //         email: 'any_email@mail.com'
-  //       });
+          expect(httpResponse.status).to.equal(400);
+          expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
+        })
       
-  //     expect(httpResponse.status).to.equal(400);
-  //     expect(httpResponse.body).to.deep.equal({ message: "All fields must be filled" });
-  //   })
+        it('caso o email esteja incorreto', async () => {
+      sinon
+        .stub(UserModel, "findOne")
+        .resolves(null);
 
-  //   it('caso o email esteja incorreto', async () => {
-  //     sinon
-  //       .stub(UserModel, "findOne")
-  //       .resolves(null);
+      const httpResponse = await chai.request(app)
+        .post('/login')
+        .send({
+          email: emailIncorrect,
+          password: 'any_password'
+        });
+  
+      expect(httpResponse.status).to.equal(401);
+      expect(httpResponse.body).to.deep.equal( { message: "Incorrect email or password" });
+  
+      (UserModel.findOne as sinon.SinonStub).restore();
+    })
+  
+    it('caso o password esteja incorreto', async () => {
 
-  //     const httpResponse = await chai.request(app)
-  //       .post('/login')
-  //       .send({
-  //         email: emailIncorrect,
-  //         password: 'any_password'
-  //       });
+        sinon
+        .stub(UserModel, "findOne")
+        .resolves({
+            email: emailCorrect,
+            password: passwordHash,
+          } as UserModel);
+    
+        const httpResponse = await chai.request(app)
+          .post('/login')
+          .send({
+              email: emailIncorrect,
+              password: passwordIncorrect
+            });
       
-  //     expect(httpResponse.status).to.equal(401);
-  //     expect(httpResponse.body).to.deep.equal( { message: "Incorrect email or password" });
-
-  //     (UserModel.findOne as sinon.SinonStub).restore();
-  //   })
-
-  //   it('caso o password esteja incorreto', async () => {
-
-  //     sinon
-  //       .stub(UserModel, "findOne")
-  //       .resolves({
-  //         email: emailCorrect,
-  //         password: passwordHash,
-  //       } as UserModel);
-
-  //     const httpResponse = await chai.request(app)
-  //       .post('/login')
-  //       .send({
-  //         email: emailIncorrect,
-  //         password: passwordIncorrect
-  //       });
+          expect(httpResponse.status).to.equal(401);
+          expect(httpResponse.body).to.deep.equal( { message: "Incorrect email or password" });
       
-  //     expect(httpResponse.status).to.equal(401);
-  //     expect(httpResponse.body).to.deep.equal( { message: "Incorrect email or password" });
-
-  //     (UserModel.findOne as sinon.SinonStub).restore();
-  //   })
-  // })
-
-  describe('Casos de sucessos', () => {
-
+          (UserModel.findOne as sinon.SinonStub).restore();
+        })
+      })
+      
+      describe('Casos de sucessos', () => {
+        
     it('Caso seja enviado o Token corretamente!', async () => {
       const httpResponse = await chai.request(app)
-        .get('/login/validate')
-        .set({'Authorization': token });
+      .get('/login/validate')
+      .set({'Authorization': token });
       
       expect(httpResponse.status).to.equal(200);
       expect(httpResponse.body).to.deep.equal({ role: payload.role });
     } )
-
+    
   })
+})
 })

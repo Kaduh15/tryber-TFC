@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import 'express-async-errors';
+import tokenMiddleware from '../middlewares/tokenMiddleware';
 import bodyMiddleware from '../middlewares/bodyMiddleware';
 import MatchController from '../controllers/MatchController';
 import bodyMetch from '../schemas/bodyMetch';
@@ -15,8 +16,15 @@ router
 router
   .post(
     '/',
+    tokenMiddleware,
     bodyMiddleware(bodyMetch),
     (req, res) => matchController.create(req, res),
+  );
+
+router
+  .patch(
+    '/:id',
+    (req, res) => matchController.updateMatchScore(req, res),
   );
 
 router

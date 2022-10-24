@@ -1,6 +1,7 @@
 import { sign, Secret, verify, JwtPayload } from 'jsonwebtoken';
 import { IUser } from '../interfaces/IUser';
 import 'dotenv/config';
+import HttpError from './HttpError';
 
 const secret: Secret = process.env.JWT_SECRET || 'secret';
 // type TErrorToken = {
@@ -19,9 +20,7 @@ export default class JWT {
       const payload = verify(token, secret) as IPayload;
       return payload;
     } catch (e) {
-      return {
-        role: '',
-      } as IPayload;
+      throw new HttpError('Token must be a valid token', 401);
     }
   }
 }

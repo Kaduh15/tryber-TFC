@@ -25,43 +25,62 @@ const mockTeams = [
   },
 ]
 
-describe('GET /Teams', () => {
-  // describe('Casos de erros', () => {
-  // })
+describe('---------------------- Rota Teams ----------------------', () => {
 
-  describe('Casos de sucessos', () => {
-    
-    it('Busca todos os times!', async () => {
-
-      sinon
+  
+  describe('GET /Teams', () => {
+    // describe('Casos de erros', () => {
+    //   it('Busca apenas um time pelo o id!', async () => {
+      
+    //     const idIncorrect = 998
+        
+    //     sinon
+    //     .stub(TeamModel, 'findOne')
+    //     .resolves(null)
+          
+    //       const httpResponse = await chai.request(app)
+    //       .get(`/teams/${idIncorrect + 1}`)
+          
+    //       expect(httpResponse.status).to.equal(200);
+    //       expect(httpResponse.body).to.deep.equal(mockTeams[idIncorrect]);
+          
+    //       (TeamModel.findOne as sinon.SinonStub).restore()
+    //   })
+    // })
+      
+    describe('Casos de sucessos', () => {
+      
+      it('Busca todos os times!', async () => {
+        
+        sinon
         .stub(TeamModel, 'findAll')
         .resolves(
           mockTeams as TeamModel[]
-        )
-
-      const httpResponse = await chai.request(app)
-        .get('/teams')
-      
-      expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body).to.deep.equal(mockTeams);
-    } )
-
-    it('Busca apenas um time pelo o id!', async () => {
-
-      const idCorrect = 1
-
-      sinon
+          )
+          
+          const httpResponse = await chai.request(app)
+          .get('/teams')
+          
+          expect(httpResponse.status).to.equal(200);
+          expect(httpResponse.body).to.deep.equal(mockTeams);
+        } )
+        
+      it('Busca apenas um time pelo o id!', async () => {
+        
+        const idCorrect = 1
+        
+        sinon
         .stub(TeamModel, 'findOne')
         .resolves(
           mockTeams[idCorrect] as TeamModel
-      )
-
-      const httpResponse = await chai.request(app)
-        .get(`/teams/${idCorrect + 1}`)
-      
-      expect(httpResponse.status).to.equal(200);
-      expect(httpResponse.body).to.deep.equal(mockTeams[idCorrect]);
-    } )
-
+          )
+          
+          const httpResponse = await chai.request(app)
+          .get(`/teams/${idCorrect + 1}`)
+          
+          expect(httpResponse.status).to.equal(200);
+          expect(httpResponse.body).to.deep.equal(mockTeams[idCorrect]);
+      })
+    })
   })
 })

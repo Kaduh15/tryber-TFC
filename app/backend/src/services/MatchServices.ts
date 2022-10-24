@@ -1,4 +1,4 @@
-import IMatch, { IMatchCreate } from '../interfaces/IMatch';
+import IMatch, { IScore, IMatchCreate } from '../interfaces/IMatch';
 import TeamModel from '../database/models/Team';
 import MatchModel from '../database/models/Match';
 import HttpError from '../utils/HttpError';
@@ -11,7 +11,7 @@ export default class MatchService {
       where: { id },
     });
 
-    if (!hasTeam) throw new HttpError('Team not found', 404);
+    if (!hasTeam) throw new HttpError('There is no team with such id!', 404);
 
     return true;
   }
@@ -34,6 +34,13 @@ export default class MatchService {
     await MatchService.teamValidation(match.homeTeam);
     await MatchService.teamValidation(match.awayTeam);
 
+    if (match.homeTeam === match.awayTeam) {
+      throw new HttpError(
+        'It is not possible to create a match with two equal teams',
+        422,
+      );
+    }
+
     const Match = await this.model.create({ ...match, inProgress: true });
 
     return Match;
@@ -46,6 +53,19 @@ export default class MatchService {
 
     await this.model.update({
       inProgress: false,
+    }, {
+      where: { id },
+    });
+  }
+
+  async updateMatchScore(id: number, score: IScore): Promise<void> {
+    const hasMatch = await this.model.findOne({ where: { id } });
+
+    if (!hasMatch) throw new HttpError('Macth not found', 404);
+    if (!hasMatch.inProgress) throw new HttpError('Match is not in progress', 409);
+
+    await this.model.update({
+      ...score,
     }, {
       where: { id },
     });
