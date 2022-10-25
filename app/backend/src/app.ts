@@ -3,6 +3,7 @@ import errorMiddleware from './middlewares/ErrorMiddleware';
 import loginRouter from './routes/loginRouter';
 import teamRouter from './routes/teamRouter';
 import matchRouter from './routes/matchRouter';
+import leaderboardRouter from './routes/leaderboardRouter';
 
 import 'express-async-errors';
 
@@ -35,6 +36,7 @@ class App {
     this.app.use('/login', loginRouter);
     this.app.use('/teams', teamRouter);
     this.app.use('/matches', matchRouter);
+    this.app.use('/leaderboard', leaderboardRouter);
     this.app.use(errorMiddleware);
   }
 

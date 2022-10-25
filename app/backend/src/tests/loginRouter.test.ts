@@ -1,6 +1,4 @@
-import { IPayload } from '../utils/JWT';
 import { IUser } from '../interfaces/IUser';
-import { Secret } from 'jsonwebtoken';
 import * as sinon from 'sinon';
 import * as chai from 'chai';
 // @ts-ignore

@@ -6,13 +6,8 @@ import chaiHttp = require('chai-http');
 
 import { Model } from 'sequelize';
 
-import IMatche from '../interfaces/IMatch'
-
 import { app } from '../app'
 import MatchModel from '../database/models/Match';
-import TeamModel from '../database/models/Match';
-import MatchService from '../services/MatchServices';
-import Team from '../database/models/Team';
 import JWT from '../utils/JWT';
 
 const { expect } = chai;

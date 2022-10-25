@@ -29,7 +29,6 @@ const mockTeams = [
 
 describe('---------------------- Rota Teams ----------------------', () => {
 
-  
   describe('1 - GET /Teams', () => {
 
     describe('Casos de erros', () => {
