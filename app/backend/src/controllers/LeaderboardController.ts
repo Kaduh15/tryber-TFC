@@ -15,4 +15,10 @@ export default class LeaderboardController {
 
     res.status(200).json(result);
   }
+
+  async away(req: Request, res: Response): Promise<void> {
+    const result = await this.service.away();
+
+    res.status(200).json(result);
+  }
 }

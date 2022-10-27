@@ -9,4 +9,7 @@ const router = Router();
 router
   .get('/home', (req, res) => leaderboardController.home(req, res));
 
+router
+  .get('/away', (req, res) => leaderboardController.away(req, res));
+
 export default router;

@@ -43,4 +43,7 @@ FROM TRYBE_FUTEBOL_CLUBE.matches as mt
 JOIN TRYBE_FUTEBOL_CLUBE.teams as t ON mt.away_team = t.id
 WHERE in_progress = 0
 GROUP BY mt.away_team) as classificação
-ORDER BY classificação.totalPoints desc,`;
+ORDER BY classificação.totalPoints desc,
+classificação.goalsBalance desc ,
+  classificação.goalsFavor desc,
+  classificação.goalsOwn desc;`;
