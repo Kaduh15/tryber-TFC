@@ -503,6 +503,7 @@ const mockInsertMetch = {
   homeTeamGoals: 2,
   awayTeamGoals: 2,
 }
+
 const mockInsertMetchError = {
   homeTeam: 999999, // O valor deve ser o id do time
   awayTeam: 999999, // O valor deve ser o id do time
@@ -750,6 +751,7 @@ describe('-------------------- Rota Matches --------------------', () =>{
   })
 
   describe('4 - PACTH /matches/:id/finish', () => {
+
     describe('Casos de Error', () => {
       
       after(() => {
@@ -797,8 +799,12 @@ describe('-------------------- Rota Matches --------------------', () =>{
         const id = 47;
         
         sinon
-        .stub(Model, 'findOne')
-        .resolves(mockInsertMetchResult as unknown as MatchModel)
+          .stub(Model, 'findOne')
+          .resolves(mockInsertMetchResult as unknown as MatchModel)
+
+        sinon
+          .stub(Model, 'update')
+          .resolves([1, []]);
 
         const httpResponse = await chai.request(app)
         .patch(`/matches/${id}/finish`)
