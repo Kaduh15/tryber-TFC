@@ -2,10 +2,17 @@
 import HttpError from '../utils/HttpError';
 import sequelize from '../database/models';
 import { IEstatisticas } from '../interfaces/IMatch';
-import { awayLeaderboard, homeLeaderboard } from '../utils/sequelizeQuery';
+import { awayLeaderboard, homeAwayLeaderboard, homeLeaderboard } from '../utils/sequelizeQuery';
 
 export default class LeaderboardService {
   private sequelize = sequelize;
+
+  async homeAway(): Promise<IEstatisticas[]> {
+    const [result] = await this.sequelize.query(homeAwayLeaderboard);
+    if (!result) throw new HttpError('error', 404);
+
+    return result as IEstatisticas[];
+  }
 
   async home(): Promise<IEstatisticas[]> {
     const [result] = await this.sequelize.query(homeLeaderboard);

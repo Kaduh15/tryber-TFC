@@ -10,6 +10,12 @@ export default class LeaderboardController {
     this.service = new LeaderboardService();
   }
 
+  async homeAway(req: Request, res: Response): Promise<void> {
+    const result = await this.service.homeAway();
+
+    res.status(200).json(result);
+  }
+
   async home(req: Request, res: Response): Promise<void> {
     const result = await this.service.home();
 
