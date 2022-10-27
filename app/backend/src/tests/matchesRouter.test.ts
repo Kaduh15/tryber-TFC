@@ -807,10 +807,12 @@ describe('-------------------- Rota Matches --------------------', () =>{
           .resolves([1, []]);
 
         const httpResponse = await chai.request(app)
-        .patch(`/matches/${id}/finish`)
+        .patch(`/matches/${id}/finish`);
         
         expect(httpResponse.status).to.equal(200);
         expect(httpResponse.body).to.deep.equal({ message: 'Finished' });
+
+        sinon.restore();
       })
     })
 
@@ -852,6 +854,10 @@ describe('-------------------- Rota Matches --------------------', () =>{
         sinon
           .stub(Model, 'findOne')
           .resolves(mockInsertMetchResult as unknown as MatchModel)
+
+        sinon
+          .stub(Model, 'update')
+          .resolves([1, []]);
 
         const httpResponse = await chai.request(app)
           .patch(`/matches/${id}`)
